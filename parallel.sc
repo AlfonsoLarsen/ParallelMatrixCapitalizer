@@ -2,7 +2,7 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-object Main extends App {
+
 
   // Define the message types
   case class CapitalizeStrings(matrix: Array[Array[String]], rowStart: Int, rowEnd: Int)
@@ -12,7 +12,6 @@ object Main extends App {
 
   // Clone the original matrix
   val originalMatrix = Array.tabulate(matrix.length, matrix(0).length)((i, j) => matrix(i)(j))
-
 
   // Divide the rows of the matrix among the available processors
   val numProcessors = Runtime.getRuntime.availableProcessors()
@@ -30,17 +29,19 @@ object Main extends App {
   // Create a Future for each range of rows to capitalize
   val futures = (0 until numProcessors).map { i =>
     val rowStart = i * rowsPerProcessor
-    val rowEnd = if (i == numProcessors - 1) matrix.length else (i + 1) * rowsPerProcessor
+    val rowEnd = if (i == numProcessors - 1) matrix(rowStart).length else (i + 1) * rowsPerProcessor
     Future(capitalizeStrings(matrix, rowStart, rowEnd))
   }
 
   // Wait for all the futures to complete and merge the results
-  val mergedMatrix = Await.result(Future.sequence(futures), Duration.Inf).flatten
+  val mergedMatrixSeq = Await.result(Future.sequence(futures), Duration.Inf)
+  val mergedMatrix = mergedMatrixSeq.toArray.flatten
 
-  // Print the original and capitalized matrices for comparison
+  // Print the original matrix for comparison
   println("Original matrix:")
   originalMatrix.foreach(row => println(row.mkString(" ")))
-  println("\nCapitalized matrix:")
-  mergedMatrix.foreach(row => println(row.mkString(" ")))
-}
+
+  // Print the capitalized matrix
+  matrix.foreach(row => println(row.mkString(" ")))
+
 
