@@ -3,7 +3,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 // Generate the random string matrix
-val matrix = Array.fill(20, 20)(scala.util.Random.alphanumeric.take(5).mkString)
+val matrix = Array.fill(200, 200)(scala.util.Random.alphanumeric.take(5).mkString)
 
 // Clone the original matrix
 val originalMatrix = Array.tabulate(matrix.length, matrix(0).length)((i, j) => matrix(i)(j))
